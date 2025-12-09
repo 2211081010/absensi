@@ -1,3 +1,4 @@
+import 'package:absensi/nextpage.dart';
 import 'package:absensi/splashscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
         '/absensi': (context) => const AbsensiPage(),
+        '/next-page': (context) => const NextPage(),
         '/profil': (context) => const PegawaiPage(),
         '/camera': (context) => CameraPage(),
 

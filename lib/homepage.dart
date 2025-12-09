@@ -13,7 +13,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String baseUrl = "http://10.28.223.39:8000/api";
+  String baseUrl = "http://192.168.1.12:8000/api";
 
   String? token;
   Map<String, dynamic>? pegawai;

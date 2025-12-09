@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'loginpage.dart';
+import 'editprofilpage.dart';
 
 class PegawaiPage extends StatefulWidget {
   const PegawaiPage({super.key});
@@ -16,13 +17,10 @@ class _PegawaiPageState extends State<PegawaiPage> {
   bool loading = true;
   String? errorMessage;
 
-  // Bottom Navigation
-  int _selectedIndex = 2; // default ke Profil
+  int _selectedIndex = 2;
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    setState(() => _selectedIndex = index);
 
     switch (index) {
       case 0:
@@ -32,7 +30,6 @@ class _PegawaiPageState extends State<PegawaiPage> {
         Navigator.pushNamed(context, '/lokasi');
         break;
       case 2:
-        Navigator.pushNamed(context, '/profil');
         break;
     }
   }
@@ -56,7 +53,7 @@ class _PegawaiPageState extends State<PegawaiPage> {
       }
 
       final response = await http.get(
-        Uri.parse("http://10.28.223.39:8000/api/pegawai/by-user"),
+        Uri.parse("http://192.168.1.12:8000/api/pegawai/by-user"),
         headers: {
           "Accept": "application/json",
           "Authorization": "Bearer $token",
@@ -114,7 +111,6 @@ class _PegawaiPageState extends State<PegawaiPage> {
                 )
               : Stack(
                   children: [
-                    // HEADER IMAGE
                     Container(
                       height: 250,
                       decoration: const BoxDecoration(
@@ -124,11 +120,11 @@ class _PegawaiPageState extends State<PegawaiPage> {
                         ),
                       ),
                     ),
-                    // CONTENT
                     SingleChildScrollView(
                       child: Column(
                         children: [
                           const SizedBox(height: 160),
+
                           // FOTO PROFIL
                           Center(
                             child: Container(
@@ -140,8 +136,8 @@ class _PegawaiPageState extends State<PegawaiPage> {
                                 image: DecorationImage(
                                   image: NetworkImage(
                                     pegawai!['foto'] != null && pegawai!['foto'] != ''
-                                        ? 'http://192.168.1.11:8000/images/${pegawai!['foto']}'
-                                        : 'http://192.168.1.11:8000/images/default_user.jpg',
+                                        ? 'http://192.168.1.12:8000/storage/${pegawai!['foto']}'
+                                        : 'http://192.168.1.12:8000/storage/default_user.jpg',
                                   ),
                                   fit: BoxFit.cover,
                                 ),
@@ -155,7 +151,9 @@ class _PegawaiPageState extends State<PegawaiPage> {
                               ),
                             ),
                           ),
+
                           const SizedBox(height: 20),
+
                           // NAMA
                           Text(
                             pegawai!['nama'] ?? '-',
@@ -164,14 +162,21 @@ class _PegawaiPageState extends State<PegawaiPage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+
                           const SizedBox(height: 6),
+
                           // NIP
                           Text(
                             "NIP: ${pegawai!['nip'] ?? '-'}",
-                            style: const TextStyle(fontSize: 17, color: Colors.black54),
+                            style: const TextStyle(
+                              fontSize: 17,
+                              color: Colors.black54,
+                            ),
                           ),
-                          const SizedBox(height: 25),
-                          // CARD INFORMASI
+
+                          const SizedBox(height: 20),
+
+                          // CARD DETAIL
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: Card(
@@ -184,7 +189,7 @@ class _PegawaiPageState extends State<PegawaiPage> {
                                   children: [
                                     Row(
                                       children: [
-                                        const Icon(Icons.email, color: Colors.blue),
+                                        const Icon(Icons.phone, color: Colors.blue),
                                         const SizedBox(width: 10),
                                         Expanded(
                                           child: Text(
@@ -213,58 +218,89 @@ class _PegawaiPageState extends State<PegawaiPage> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 40),
-                          // LOGOUT BUTTON
+
+                          const SizedBox(height: 30),
+
+                          // TOMBOL SEJAJAR (EDIT KIRI, LOGOUT KANAN)
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-                            child: SizedBox(
-                              width: double.infinity,
-                              height: 50,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              children: [
+                                // EDIT PROFIL
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 50,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.blue,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(30),
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => EditProfilPage(data: pegawai!),
+                                          ),
+                                        );
+                                        getPegawai(); // refresh setelah edit
+                                      },
+                                      child: const Text(
+                                        "EDIT PROFIL",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                onPressed: logout,
-                                child: const Text(
-                                  "LOGOUT",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
+                                const SizedBox(width: 15),
+                                // LOGOUT
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 50,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(30),
+                                        ),
+                                      ),
+                                      onPressed: logout,
+                                      child: const Text(
+                                        "LOGOUT",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 40),
+
+                          const SizedBox(height: 20),
                         ],
                       ),
                     ),
                   ],
                 ),
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        backgroundColor: Colors.white,
         selectedItemColor: const Color(0xff0078C8),
         unselectedItemColor: Colors.grey,
         showSelectedLabels: false,
         showUnselectedLabels: false,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, size: 30),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.location_on, size: 30),
-            label: 'Lokasi',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, size: 30),
-            label: 'Profil',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home, size: 30), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.location_on, size: 30), label: 'Lokasi'),
+          BottomNavigationBarItem(icon: Icon(Icons.person, size: 30), label: 'Profil'),
         ],
       ),
     );

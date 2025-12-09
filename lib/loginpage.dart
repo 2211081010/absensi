@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final response = await http.post(
-        Uri.parse("http://10.28.223.39:8000/api/login"),
+        Uri.parse("http://192.168.1.12:8000/api/login"),
         headers: {"Accept": "application/json"},
         body: {
           "username": usernameC.text,
